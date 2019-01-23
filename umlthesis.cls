@@ -195,6 +195,12 @@
 \chapter*{\abstractname}
 }{}
 
+%% ACKNOWLEDGMENTS
+\newenvironment{acknowledgments}{%
+\chapter*{Acknowledgments}%
+}{%
+\clearpage}
+
 
 %% TITLE PAGE
 % All caps, so it's extra ugly
