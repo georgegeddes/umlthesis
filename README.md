@@ -1,4 +1,4 @@
-This is a Latex document class that attempts to follow the [UML Thesis Guide](https://www.uml.edu/registrar/docs/thesis_guide.pdf "UML Thesis Guide"). At some point it was forked off of [umlthesis](https://github.com/engaing-computing/umlthesis "msherman's umlthesis"), but it is quite different now.
+This is a Latex document class that attempts to follow the [UML Thesis Guide](https://www.uml.edu/registrar/docs/thesis_guide.pdf "UML Thesis Guide"). At some point it was forked off of [umlthesis](https://github.com/engaging-computing/umlthesis "msherman's umlthesis"), but it is quite different now.
 
   * TODO
 	- Table numbers should be centered and underlined.
