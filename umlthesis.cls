@@ -285,3 +285,10 @@
 \end{titlepage}
 \fi
 }
+
+% https://github.com/umasscs/umassthesis/issues/1
+\RequirePackage{hyperref}
+\pdfstringdefDisableCommands{%
+  \let\MakeUppercase\relax
+  \let\MakeLowercase\relax
+}
