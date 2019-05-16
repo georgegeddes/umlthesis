@@ -54,8 +54,9 @@
 
 % "The first page of a new chapter should begin 2 in. from the top of the page."
 % My interpretation of this is that the heading begins 2 in from the top.
-\def\@makeanychapterhead#1#2{%
-  \def\chapterheading{\Huge \bfseries \underline{#1#2}}
+\newcommand*{\chapterheading}{}
+\newcommand*{\@makeanychapterhead}[2]{%
+  \renewcommand*{\chapterheading}{\Huge \bfseries \underline{#1#2}}
   \vspace*{1in}%
   %% Uncomment below to make the text start 2 in down, rather than the heading
   % \newlength{\chapterheadingheight}
@@ -72,8 +73,9 @@
     \pagenumbering{arabic}
     \setcounter{page}{1}
   \fi}\fi }
-\def\@makechapterhead#1{\@makeanychapterhead{\thechapter. }{#1}}  % Numbered chapters
-\def\@makeschapterhead#1{\@makeanychapterhead{}{#1}}  % Unnumbered chapters
+\renewcommand*{\@makechapterhead}[1]{\@makeanychapterhead{\thechapter. }{#1}}  % Numbered chapters
+\renewcommand*{\@makeschapterhead}[1]{\@makeanychapterhead{}{#1}}  % Unnumbered chapters
+  
 
 
 %% PAGE NUMBERING
@@ -83,11 +85,11 @@
 \global\@maintextfalse
 \pagenumbering{roman}  % Begin the document with lowercase roman numbers
 
-\def\ps@plain{
-  \def\@oddfoot{\if@maintext\empty\else \hfil \em \thepage \hfil \fi}
-  \def\@evenhead{\if@maintext \rm \thepage\hfil\sl\leftmark\hbox {} \fi}	%
-  \def\@oddhead{\if@maintext \hbox{}\sl\rightmark \hfil \rm\thepage \fi}	%
-  \def\@evenfoot{\@oddfoot}
+\renewcommand*{\ps@plain}{
+  \renewcommand*{\@oddfoot}{\if@maintext\empty\else \hfil \em \thepage \hfil \fi}
+  \renewcommand*{\@evenhead}{\if@maintext \rm \thepage\hfil\sl\leftmark\hbox {} \fi}	%
+  \renewcommand*{\@oddhead}{\if@maintext \hbox{}\sl\rightmark \hfil \rm\thepage \fi}	%
+  \renewcommand*{\@evenfoot}{\@oddfoot}
 }
 \pagestyle{plain} % reload the plain page style to apply changes
 
@@ -105,9 +107,9 @@
 
 % Capitalize
 \let\ORIGchapter\chapter
-\def\chapter{\@ifstar\@umlchapterstar\@umlchapter}
-\def\@umlchapter#1{\ORIGchapter{\protect\MakeUppercase{#1}}}
-\def\@umlchapterstar#1{\ORIGchapter*{\protect\MakeUppercase{#1}}}
+\renewcommand*{\chapter}{\@ifstar\@umlchapterstar\@umlchapter}
+\newcommand*{\@umlchapter}[1]{\ORIGchapter{\protect\MakeUppercase{#1}}}
+\newcommand*{\@umlchapterstar}[1]{\ORIGchapter*{\protect\MakeUppercase{#1}}}
 
 % Roman chapter numbering:
 \renewcommand{\thechapter}{\Roman{chapter}}
@@ -128,7 +130,7 @@
 % First, we define our desired textwidth for footnotes
 \newlength\footnotewidth
 \setlength{\footnotewidth}{\textwidth - 10\spacewidth}
-\long\def\@footnotetext#1{% This monster is copied from report.cls
+\renewcommand{\@footnotetext}[1]{% This monster is copied from report.cls
 \insert \footins {\reset@font \footnotesize \interlinepenalty \interfootnotelinepenalty \splittopskip \footnotesep \splitmaxdepth \dp \strutbox \floatingpenalty \@MM \hsize \columnwidth \@parboxrestore \protected@edef \@currentlabel {\csname p@footnote\endcsname \@thefnmark }\color@begingroup%  Everything above this is default
 \centering\begin{minipage}{\footnotewidth} \singlespacing %  This line is added
 {\@makefntext {\rule \z@ \footnotesep \ignorespaces #1\@finalstrut \strutbox }\color@endgroup }%
@@ -207,11 +209,13 @@
 \newcommand*{\choosecase}[1]{\expandafter\MakeUppercase{#1}}
 
 % Some macros to input information
-\newcommand*{\department}[1]{\gdef \@department {#1}}
-\newcommand*{\supervisor}[1]{\gdef \@supervisor {#1}}
-\newcommand*{\supervisortitle}[1]{\gdef \@supervisortitle {#1}}
-\newcommand*{\reader}[1]{\gdef \@reader {#1}}
-\newcommand*{\chair}[1]{\gdef \@chair {#1}}
+\newcommand*{\department}[1]{\gdef\@department{#1}}
+\newcommand*{\supervisor}[1]{\gdef\@supervisor{#1}}
+\newcommand*{\supervisortitle}[1]{\gdef\@supervisortitle{#1}}
+\newcommand*{\chair}[1]{\gdef\@chair{#1}}
+% default titles
+\newcommand*\@supervisortitle{Thesis Supervisor}
+\newcommand*\@chairtitle{Department Chair}
 
 % The current degree(s)
 \newcounter{degrees}
@@ -254,32 +258,40 @@
 \newcommand*{\uni}{UML}
 
 %% Title Page
-\renewcommand{\maketitle}{\if@final%
-\begin{titlepage}%
+\newlength\siglinewidth
+\setlength\siglinewidth{0.8\textwidth}
+\newcommand*{\sigline}[2][Thesis Committee]{\rule{\siglinewidth/4}{.1pt}&\rule{3\siglinewidth/4}{.1pt}\\#2&#1\\}
+
+\renewcommand*{\maketitle}{\if@final%
+  \begin{titlepage}%
 \centering%
-{\def\baselinestretch{1.2}\huge \choosecase{\@title} \par}%
+{\renewcommand*\baselinestretch{1.2}\huge \choosecase{\@title} \par}%
 \par \vfill
 \choosecase{by}
 \par \vfill
 \choosecase{\@author}\vskip 6pt \\
-\@prevdegrees\relax                   % TODO
+%\@prevdegrees\relax                   % TODO
 \par \vfill
 \choosecase{Submitted in partial fulfillment of the requirements} \\
 \choosecase{for the} \choosecase{\@degreeword} \choosecase{of} 
-	\@degree \\              % TODO
-\choosecase{\@department} \\
+	\expandafter\choosecase{\@degree} \\[\baselineskip]
+\choosecase{\@department} \\[\baselineskip]
 \par\choosecase{\university}\par
 \vskip 3\baselineskip
-\begin{tabular}{@{}rl@{}}
-  Author&\rule{0.4\textwidth}{.1pt}\\
-  \@thesisdate&\\
-  \@supervisor&\rule{0.4\textwidth}{.1pt}\\
-  Tim Cook&\rule{0.4\textwidth}{.1pt}\\
-  Erno Sajo&\rule{0.4\textwidth}{.1pt}\\
-  \\
-  Accepted by&\\
-  \@chairmanname&\rule{0.4\textwidth}{.1pt}\\
-  \@chairmantitle&\\
+\singlespacing
+\newcommand\emptyline{\phantom{a}\\}
+\begin{tabular}{@{}r@{}r@{}}
+  \sigline[\@date]{Author}\\
+  \sigline[\@supervisortitle]{\@supervisor}
+  \emptyline
+  \ifdefined\readeri\sigline\readeri\emptyline\fi
+  \ifdefined\readerii\sigline\readerii\emptyline\fi
+  \ifdefined\readeriii\sigline\readeriii\emptyline\fi
+\vfill
+\\\makebox[\siglinewidth][l]{Accepted by}\\\emptyline\emptyline
+\begin{tabular}{@{}r@{}r@{}}
+  \sigline[\@chairtitle]{\@chair}
+  \doublespacing
 \end{tabular}
 \vfill
 \end{titlepage}
