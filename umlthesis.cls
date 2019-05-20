@@ -202,13 +202,19 @@
 
 %% TITLE PAGE
 % All caps, so it's extra ugly
-\newcommand*{\choosecase}[1]{\expandafter\MakeUppercase{#1}}
+\let\choosecase\MakeUppercase
 
 % Some macros to input information
 \newcommand*{\department}[1]{\gdef\@department{#1}}
 \newcommand*{\supervisor}[1]{\gdef\@supervisor{#1}}
 \newcommand*{\supervisortitle}[1]{\gdef\@supervisortitle{#1}}
 \newcommand*{\chair}[1]{\gdef\@chair{#1}}
+\newcounter{reader}
+\newcommand*{\reader}[1]{%
+  \stepcounter{reader}%
+  \expandafter\gdef\csname @reader\roman{reader}\endcsname{#1}%
+}
+
 % default titles
 \newcommand*\@supervisortitle{Thesis Supervisor}
 \newcommand*\@chairtitle{Department Chair}
@@ -256,42 +262,59 @@
 %% Title Page
 \newlength\siglinewidth
 \setlength\siglinewidth{0.8\textwidth}
-\newcommand*{\sigline}[2][Thesis Committee]{\rule{\siglinewidth/4}{.1pt}&\rule{3\siglinewidth/4}{.1pt}\\#2&#1\\}
+\newcommand*{\sigline}[2][]{
+  \vspace{1cm}
+  \begin{minipage}[t][1cm][l]{\siglinewidth}
+  \rule{\linewidth}{0.1pt}
 
-\renewcommand*{\maketitle}{\if@final%
-  \begin{titlepage}%
-\centering%
-{\renewcommand*\baselinestretch{1.2}\huge \choosecase{\@title} \par}%
-\par \vfill
-\choosecase{by}
-\par \vfill
-\choosecase{\@author}\vskip 6pt \\
-%\@prevdegrees\relax                   % TODO
-\par \vfill
-\choosecase{Submitted in partial fulfillment of the requirements} \\
-\choosecase{for the} \choosecase{\@degreeword} \choosecase{of} 
-	\expandafter\choosecase{\@degree} \\[\baselineskip]
-\choosecase{\@department} \\[\baselineskip]
-\par\choosecase{\university}\par
-\vskip 3\baselineskip
-\singlespacing
-\newcommand\emptyline{\phantom{a}\\}
-\begin{tabular}{@{}r@{}r@{}}
-  \sigline[\@date]{Author}\\
-  \sigline[\@supervisortitle]{\@supervisor}
-  \emptyline
-  \ifdefined\readeri\sigline\readeri\emptyline\fi
-  \ifdefined\readerii\sigline\readerii\emptyline\fi
-  \ifdefined\readeriii\sigline\readeriii\emptyline\fi
-\vfill
-\\\makebox[\siglinewidth][l]{Accepted by}\\\emptyline\emptyline
-\begin{tabular}{@{}r@{}r@{}}
-  \sigline[\@chairtitle]{\@chair}
-  \doublespacing
-\end{tabular}
-\vfill
-\end{titlepage}
-\fi
+  {#2}
+  
+  \emph{#1}
+  \end{minipage}
+
+}
+
+\renewcommand*{\maketitle}{
+  \begin{titlepage}
+    \let\name\relax
+    \centering
+    \singlespacing
+    \vspace*{}\vfill
+    {\Huge \choosecase{\@title}}\par
+    \vfill
+    \choosecase{by}
+
+    \vfill
+    \choosecase{\@author}
+    %\@prevdegrees\relax                   % TODO
+    \vfill
+
+    \choosecase{Submitted in partial fulfillment of the requirements}\\
+    \choosecase{for the \@degreeword of \@degree}
+
+    \vspace{1.5\baselineskip}
+    
+    \choosecase{\@department}
+
+    \vspace{1.5\baselineskip}
+
+    \choosecase{\university}
+    
+    \vfill
+
+    \sigline{Author\hfill\@date}
+    \sigline[\@supervisortitle]{\name{\@supervisor}}
+    \ifdefined\@readeri\sigline{\name{\@readeri}}\fi
+    \ifdefined\@readerii\sigline{\name{\@readerii}}\fi
+    \ifdefined\@readeriii\sigline{\name{\@readeriii}}\fi
+    \ifdefined\@readeriv\sigline{\name{\@readeriv}}\fi
+    \ifdefined\@readerv\sigline{\name{\@readerv}}\fi
+
+    \vspace{\baselineskip}
+    \makebox[\siglinewidth][l]{Accepted by}
+    
+    \sigline[\@chairtitle]{\name{\@chair}}
+  \end{titlepage}
 }
 
 % https://github.com/umasscs/umassthesis/issues/1
