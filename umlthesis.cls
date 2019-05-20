@@ -190,7 +190,8 @@
 
 %% ABSTRACT
 \renewenvironment{abstract}{%
-\chapter*{\abstractname}
+  \abstracttitlepage
+  \chapter*{\abstractname}
 }{}
 
 %% ACKNOWLEDGMENTS
@@ -206,8 +207,13 @@
 
 % Some macros to input information
 \newcommand*{\department}[1]{\gdef\@department{#1}}
+\newcommand*{\concentration}[1]{\gdef\@concentration{#1}}
+\concentration{\@department}
 \newcommand*{\supervisor}[1]{\gdef\@supervisor{#1}}
 \newcommand*{\supervisortitle}[1]{\gdef\@supervisortitle{#1}}
+\newcommand*{\supervisorposition}[1]{\gdef\@supervisorposition{#1}}
+\newcommand*{\supervisordegree}[1]{\gdef\@supervisordegree{#1}}
+\newcommand*{\supervisordepartment}[1]{\gdef\@supervisordepartment{#1}}
 \newcommand*{\chair}[1]{\gdef\@chair{#1}}
 \newcounter{reader}
 \newcommand*{\reader}[1]{%
@@ -216,7 +222,10 @@
 }
 
 % default titles
-\newcommand*\@supervisortitle{Thesis Supervisor}
+\supervisortitle{Thesis Supervisor}
+\supervisordegree{Ph.D.}
+\supervisorposition{Professor}
+\supervisordepartment{\@department}
 \newcommand*\@chairtitle{Department Chair}
 
 % The current degree(s)
@@ -236,9 +245,9 @@
 \stepcounter{prevdegrees}%
 \expandafter\gdef\csname @prevdegree\roman{prevdegrees}\endcsname{#1\ {#2} (#3)}\relax%
 \ifnum \value{prevdegrees} =1\relax%
-\gdef\@prevdegrees{\@prevdegreei\relax\relax}%
+\long\gdef\@prevdegrees{\@prevdegreei\relax}%
 \else%
-\xdef\@prevdegrees{\@prevdegrees\par\relax\csname @prevdegree\roman{prevdegrees}\endcsname}%
+\long\xdef\@prevdegrees{\@prevdegrees\par\relax\csname @prevdegree\roman{prevdegrees}\endcsname}%
 \fi%
 }
 % \newcommand{\@prevdegrees}{% Print each degree that has been stored.
@@ -262,31 +271,36 @@
 %% Title Page
 \newlength\siglinewidth
 \setlength\siglinewidth{0.8\textwidth}
-\newcommand*{\sigline}[2][]{
+\newcommand*{\sigline}[2][Thesis Comittee]{
   \vspace{1cm}
   \begin{minipage}[t][1cm][l]{\siglinewidth}
-  \rule{\linewidth}{0.1pt}
+  {#1:}\hrulefill
 
   {#2}
-  
-  \emph{#1}
   \end{minipage}
 
 }
 
 \renewcommand*{\maketitle}{
   \begin{titlepage}
-    \let\name\relax
+    \let\name\textsc
     \centering
     \singlespacing
-    \vspace*{}\vfill
+    \vspace*{0pt}\vfill
     {\Huge \choosecase{\@title}}\par
-    \vfill
+
+    \vspace{\baselineskip}
+
     \choosecase{by}
 
-    \vfill
+    \vspace{\baselineskip}
+
     \choosecase{\@author}
-    %\@prevdegrees\relax                   % TODO
+    
+    \choosecase{\@prevdegrees}
+
+    \vspace{\baselineskip}
+
     \vfill
 
     \choosecase{Submitted in partial fulfillment of the requirements}\\
@@ -294,7 +308,7 @@
 
     \vspace{1.5\baselineskip}
     
-    \choosecase{\@department}
+    \choosecase{Department of \@department}
 
     \vspace{1.5\baselineskip}
 
@@ -302,7 +316,7 @@
     
     \vfill
 
-    \sigline{Author\hfill\@date}
+    \sigline[Author]{\name{\@author}\hfill\@date}
     \sigline[\@supervisortitle]{\name{\@supervisor}}
     \ifdefined\@readeri\sigline{\name{\@readeri}}\fi
     \ifdefined\@readerii\sigline{\name{\@readerii}}\fi
@@ -310,11 +324,55 @@
     \ifdefined\@readeriv\sigline{\name{\@readeriv}}\fi
     \ifdefined\@readerv\sigline{\name{\@readerv}}\fi
 
-    \vspace{\baselineskip}
-    \makebox[\siglinewidth][l]{Accepted by}
+    %% \vspace{\baselineskip}
+    %% \makebox[\siglinewidth][l]{Accepted by}
     
-    \sigline[\@chairtitle]{\name{\@chair}}
+    %% \sigline[\@chairtitle]{\name{\@chair}}
   \end{titlepage}
+}
+
+\newcommand*\@degreeyear{2019}
+\newcommand*\abstracttitlepage{
+  \clearpage
+  \thispagestyle{empty}
+  \centering
+  \singlespacing
+  \vspace*{1in}
+  {\Huge \choosecase{\@title}}
+  
+  \vspace{\baselineskip}
+  
+  \choosecase{by}
+
+  \vspace{\baselineskip}
+
+  \choosecase{\@author}
+
+  \vspace{2\baselineskip}
+
+  \choosecase{Abstract of a dissertation submitted to the faculty of the}
+
+  \choosecase{Department of \@department}
+
+  \choosecase{in partial fulfillment of the requirements}
+  \vspace{2\baselineskip}
+  
+  \choosecase{for the \@degreeword of}
+
+  \choosecase{\@degree}
+
+  \choosecase{\@concentration}
+
+  \choosecase{\university}
+
+  \choosecase{\@degreeyear}
+
+  \vspace{2\baselineskip}
+  \raggedright
+  Dissertation Supervisor: \@supervisor, \@supervisordegree
+  
+  \@supervisorposition, \@supervisordepartment
+  \newpage
 }
 
 % https://github.com/umasscs/umassthesis/issues/1
