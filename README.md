@@ -5,4 +5,5 @@ To use this class, either put `umlthesis.cls` in the working directory of your t
   * TODO
 	- Table numbers should be centered and underlined.
 	- Table of Contents, List of Figures, List of Tables should be formatted with upper case titles, I think.
-	- Title page.
+	- Title Page.
+	- Abstract Title Page
