@@ -4,10 +4,6 @@
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{umlthesis}[01/23/2019]
 
-\newif\if@final
-\@finalfalse
-\DeclareOption{final}{\@finaltrue\setlength\overfullrule{0pt}}
-
 \DeclareOption*{\PassOptionsToClass{\CurrentOption}{report}}
 
 \ExecuteOptions{12pt}
