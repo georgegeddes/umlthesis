@@ -89,9 +89,6 @@
 }
 \pagestyle{plain} % reload the plain page style to apply changes
 
-\typeout{TODO: Define the abstract title page here}
-
-
 %% TABLES AND FIGURES
 % I have implemented the necessary changes somewhere. I think it is on
 % the laptop. Paste those here.
@@ -376,7 +373,7 @@
 }
 
 % https://github.com/umasscs/umassthesis/issues/1
-\RequirePackage[colorlinks=false]{hyperref}
+\RequirePackage[hidelinks=true]{hyperref}
 \pdfstringdefDisableCommands{%
   \let\MakeUppercase\relax
   \let\MakeLowercase\relax
