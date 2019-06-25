@@ -90,9 +90,15 @@
 \pagestyle{plain} % reload the plain page style to apply changes
 
 %% TABLES AND FIGURES
-% I have implemented the necessary changes somewhere. I think it is on
-% the laptop. Paste those here.
-
+%% TODO: Edit \@makecaption to make Table numbers centered and underlined.
+%%       Currently, this affects both Figures and Tables, so it should be
+%%       split into two flavors depending on \@captype, which is either
+%%       'figure' or 'table'.
+\renewcommand\@makecaption[2]{\vskip \abovecaptionskip \sbox \@tempboxa {#1: #2}\ifdim \wd \@tempboxa > \hsize #1: #2\par \else \global \@minipagefalse \hb@xt@ \hsize {\hfil \box \@tempboxa \hfil }\fi \vskip \belowcaptionskip} 
+%% Continuous numering
+\RequirePackage{chngcntr}
+\counterwithout{figure}{chapter}
+\counterwithout{table}{chapter}
 
 %% HEADINGS
 % Chapter headings are numbered with roman numerals, capitalized,
