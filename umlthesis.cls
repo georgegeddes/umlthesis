@@ -112,12 +112,6 @@
 
 % Roman chapter numbering:
 \renewcommand{\thechapter}{\Roman{chapter}}
-\RequirePackage{tocloft}
-\newlength\chapnumextra
-\setlength\chapnumextra{1mm}
-\addtolength\cftchapnumwidth\chapnumextra
-\addtolength\cftsecindent\chapnumextra
-\addtolength\cftsubsecindent\chapnumextra
 
 %% EQUATIONS
 % Equation numbering should be a single Arabic numeral.
@@ -160,6 +154,10 @@
 % Footnote numbering
 \renewcommand{\thefootnote}{\alph{footnote}}
 
+%% VERBATIM ENVIRONMENT
+%% Use single spacing for code blocks.
+\RequirePackage{verbatim}
+\addto@hook\every@verbatim{\singlespacing}
 
 %% BIBLIOGRAPHY
 % Change the default bibliography name
@@ -175,13 +173,54 @@
 
 
 %% TABLE OF CONTENTS
-%% TODO: Figure out why figures and tables aren't showing up
-% \let\ORIGlof\listoffigures
-% \def\listoffigures{\ORIGlof\protect{\protect\addcontentsline{toc}{section}{\listfigurename}}}
-% \let\ORIGlot\listoftables
-% \def\listoftables{FOO BAR baz}
-% \def\ORIGtoc\tableofcontents
-% \def\mytableofcontents{\ORIGtoc\listoffigures\listoftables}
+\RequirePackage{tocloft}
+\renewcommand*\contentsname{CONTENTS}
+\renewcommand*\listfigurename{FIGURES}
+\renewcommand*\listtablename{TABLES}
+
+%% Give a little more room to the chapter numbers
+\newlength\chapnumextra
+\setlength\chapnumextra{1mm}
+\addtolength\cftchapnumwidth\chapnumextra
+\addtolength\cftsecindent\chapnumextra
+\addtolength\cftsubsecindent\chapnumextra
+
+%% Put the LOT and LOF headings into TOC
+\renewcommand\cftlofprehook{%
+  \protect\phantomsection%
+  \cftaddtitleline{toc}{chapter}{\listfigurename}{\thepage}%
+}
+
+\renewcommand\cftlotprehook{%
+  \protect\phantomsection%
+  \cftaddtitleline{toc}{chapter}{\listtablename}{\thepage}}
+
+
+%% Chapter headings in list of figures, tables. This will put /every/
+%% chapter in, regardless of whether it contains any tables or
+%% figures. My best solution for this so far is something like:
+%%  \immediate\write18{sed -ni -f remove-duplicate-chapters.sed build/main.lof}
+\def\@chapter[#1]#2{%
+  \ifnum \c@secnumdepth >\m@ne
+    \refstepcounter {chapter}%
+    \typeout {\@chapapp \space \thechapter .}%
+    \addcontentsline {toc}{chapter}{\protect \numberline {\thechapter }#1}%
+  \else
+    \addcontentsline {toc}{chapter}{#1}%
+  \fi
+  \chaptermark {#1}%
+  %%%%%%%%%%%%%% CHANGES HERE %%%%%%%%%%%%%%%%%%%%%%%
+  %% \addtocontents {lof}{\protect \addvspace {10\p@ }}%
+  \addcontentsline {lof}{chapter}{\protect \numberline {\thechapter }#1}%
+  %% \addtocontents {lot}{\protect \addvspace {10\p@ }}%
+  \addcontentsline {lot}{chapter}{\protect \numberline {\thechapter }#1}%
+  %%%%%%%%%%%%%% END CHANGES %%%%%%%%%%%%%%%%%%%%%%%%
+  \if@twocolumn
+    \@topnewpage [\@makechapterhead {#2}]%
+  \else
+    \@makechapterhead {#2}\@afterheading%
+  \fi%
+}
 
 
 %% AUTHOR BIOGRAPHY
