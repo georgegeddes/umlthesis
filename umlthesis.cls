@@ -418,7 +418,7 @@
 }
 
 % https://github.com/umasscs/umassthesis/issues/1
-\RequirePackage[hidelinks=true]{hyperref}
+\RequirePackage[hidelinks]{hyperref}
 \pdfstringdefDisableCommands{%
   \let\MakeUppercase\relax
   \let\MakeLowercase\relax
