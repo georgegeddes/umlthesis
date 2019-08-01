@@ -174,9 +174,9 @@
 
 %% TABLE OF CONTENTS
 \RequirePackage{tocloft}
-\renewcommand*\contentsname{CONTENTS}
-\renewcommand*\listfigurename{FIGURES}
-\renewcommand*\listtablename{TABLES}
+\renewcommand*\contentsname{\protect\MakeUppercase{Contents}}
+\renewcommand*\listfigurename{\protect\MakeUppercase{Figures}}
+\renewcommand*\listtablename{\protect\MakeUppercase{Tables}}
 
 %% Give a little more room to the chapter numbers
 \newlength\chapnumextra
@@ -186,14 +186,13 @@
 \addtolength\cftsubsecindent\chapnumextra
 
 %% Put the LOT and LOF headings into TOC
+%% \cftaddtitleline does not insert an entry into the PDF index
 \renewcommand\cftlofprehook{%
-  \protect\phantomsection%
-  \cftaddtitleline{toc}{chapter}{\listfigurename}{\thepage}%
-}
-
-\renewcommand\cftlotprehook{%
-  \protect\phantomsection%
-  \cftaddtitleline{toc}{chapter}{\listtablename}{\thepage}}
+  \phantomsection%
+  \addcontentsline{toc}{chapter}{\listfigurename}}
+\renewcommand\cftlotprehook{
+  \phantomsection%
+  \addcontentsline{toc}{chapter}{\listtablename}}
 
 
 %% Chapter headings in list of figures, tables. This will put /every/
