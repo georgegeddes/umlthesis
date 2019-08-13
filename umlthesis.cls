@@ -20,6 +20,9 @@
 \RequirePackage{setspace}
 \doublespacing
 
+% This is not in the thesis guide, but frenchspacing is nicer.
+\frenchspacing
+
 % Indent first line of paragraphs by 10 spaces
 \newlength{\spacewidth}
 \newlength{\fivespaces}
@@ -94,7 +97,7 @@
 %%       Currently, this affects both Figures and Tables, so it should be
 %%       split into two flavors depending on \@captype, which is either
 %%       'figure' or 'table'.
-\renewcommand\@makecaption[2]{\vskip \abovecaptionskip \sbox \@tempboxa {#1: #2}\ifdim \wd \@tempboxa > \hsize #1: #2\par \else \global \@minipagefalse \hb@xt@ \hsize {\hfil \box \@tempboxa \hfil }\fi \vskip \belowcaptionskip} 
+\renewcommand\@makecaption[2]{\vskip \abovecaptionskip \sbox \@tempboxa {\textsc{#1}: #2}\ifdim \wd \@tempboxa > \hsize \textsc{#1}: #2\par \else \global \@minipagefalse \hb@xt@ \hsize {\hfil \box \@tempboxa \hfil }\fi \vskip \belowcaptionskip} 
 %% Continuous numering
 \RequirePackage{chngcntr}
 \counterwithout{figure}{chapter}
@@ -121,14 +124,14 @@
 %% FOOTNOTES AND QUOTATIONS
 % Narrower footnote
 % First, we define our desired textwidth for footnotes
-\newlength\footnotewidth
-\setlength{\footnotewidth}{\textwidth - 10\spacewidth}
-\renewcommand{\@footnotetext}[1]{% This monster is copied from report.cls
-\insert \footins {\reset@font \footnotesize \interlinepenalty \interfootnotelinepenalty \splittopskip \footnotesep \splitmaxdepth \dp \strutbox \floatingpenalty \@MM \hsize \columnwidth \@parboxrestore \protected@edef \@currentlabel {\csname p@footnote\endcsname \@thefnmark }\color@begingroup%  Everything above this is default
-\centering\begin{minipage}{\footnotewidth} \singlespacing %  This line is added
-{\@makefntext {\rule \z@ \footnotesep \ignorespaces #1\@finalstrut \strutbox }\color@endgroup }%
-\end{minipage}% close the minipage.
-}}
+%% \newlength\footnotewidth
+%% \setlength{\footnotewidth}{\textwidth - 10\spacewidth}
+%% \renewcommand{\@footnotetext}[1]{% This monster is copied from report.cls
+%% \insert \footins {\reset@font \footnotesize \interlinepenalty \interfootnotelinepenalty \splittopskip \footnotesep \splitmaxdepth \dp \strutbox \floatingpenalty \@MM \hsize \columnwidth \@parboxrestore \protected@edef \@currentlabel {\csname p@footnote\endcsname \@thefnmark }\color@begingroup%  Everything above this is default
+%% \centering\begin{minipage}{\footnotewidth} \singlespacing %  This line is added
+%% {\@makefntext {\rule \z@ \footnotesep \ignorespaces #1\@finalstrut \strutbox }\color@endgroup }%
+%% \end{minipage}% close the minipage.
+%% }}
 
 % Change the indentation of quotations
 \renewenvironment{quotation}
@@ -312,14 +315,20 @@
 %% Title Page
 \newlength\siglinewidth
 \setlength\siglinewidth{0.8\textwidth}
-\newcommand*{\sigline}[2][Thesis Comittee]{
+\newcommand*{\sigline}[2][]{
+  % Begin with some room for the signature
   \vspace{1cm}
-  \begin{minipage}[t][1cm][l]{\siglinewidth}
-  {#1:}\hrulefill
 
-  {#2}
+  % Create the signature box with name underneath
+  \begin{minipage}[t][][l]{\siglinewidth}
+    \hrulefill
+
+    {#2\\
+      % Print the optional title below the name without adding vertical space
+      #1\vspace*{-\baselineskip}\\}
   \end{minipage}
-
+  % Insert a flexible space after the signature block
+  \vskip 12pt plus 36pt
 }
 
 \renewcommand*{\maketitle}{
@@ -357,7 +366,16 @@
     
     \vfill
 
-    \sigline[Author]{\name{\@author}\hfill\@date}
+    \raggedright
+    \hspace*{1cm}\hbox{Author}
+
+    \centering
+    \sigline{\name{\@author}\hfill\@date}
+
+    \raggedright
+    \hspace*{1cm}\hbox{Thesis Committee}
+
+    \centering
     \sigline[\@supervisortitle]{\name{\@supervisor}}
     \ifdefined\@readeri\sigline{\name{\@readeri}}\fi
     \ifdefined\@readerii\sigline{\name{\@readerii}}\fi
