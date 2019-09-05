@@ -65,12 +65,15 @@
     \chapterheading \par\nobreak
     \vskip 40\p@
   }
-  % On the first chapter, reset the page numbering
-  \ifnum \value{chapter}=1
-  {\if@maintext\else%  If we are beginning chapter 1 and not appendix A:
+  %% On the first numbered chapter, reset the page numbering
+  \ifnum \value{chapter}>0
+  {\if@maintext\else            % Only do this part once
     \global\@maintexttrue
     \pagenumbering{arabic}
+    %% Only reset page numbers themselves on Chapter 1
+    \ifnum \value{chapter}=1
     \setcounter{page}{1}
+    \fi
   \fi}\fi }
 \renewcommand*{\@makechapterhead}[1]{\@makeanychapterhead{\thechapter. }{#1}}  % Numbered chapters
 \renewcommand*{\@makeschapterhead}[1]{\@makeanychapterhead{}{#1}}  % Unnumbered chapters
