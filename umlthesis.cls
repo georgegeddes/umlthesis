@@ -37,8 +37,8 @@
 \renewcommand{\Huge}{\fontsize{14}{16.8}\selectfont}
 \renewcommand{\footnotesize}{\normalsize}
 \renewcommand{\scriptsize}{\normalsize}
-\renewcommand{\small}{\normalsize}
-\renewcommand{\tiny}{\normalsize}
+\renewcommand{\small}{\fontsize{11}{13.2}}
+\renewcommand{\tiny}{\fontsize{8}{9.6}}
 \renewcommand{\large}{\normalsize}
 \renewcommand{\Large}{\normalsize}
 \renewcommand{\LARGE}{\normalsize}
