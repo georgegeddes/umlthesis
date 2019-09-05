@@ -12,7 +12,7 @@
 
 \LoadClass{report}
 \RequirePackage{calc}
-\RequirePackage{natbib}
+%\RequirePackage{natbib}
 
 
 %% TYPING
