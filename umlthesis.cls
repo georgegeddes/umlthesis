@@ -196,7 +196,8 @@
 \renewcommand\cftlotprehook{
   \phantomsection%
   \addcontentsline{toc}{chapter}{\listtablename}}
-
+%% Also add TOC to PDF index
+\renewcommand\cfttocprehook{\phantomsection\pdfbookmark{Contents}{umlthesistoc}}
 
 %% Chapter headings in list of figures, tables. This will put /every/
 %% chapter in, regardless of whether it contains any tables or
