@@ -230,8 +230,10 @@
   %%%%%%%%%%%%%% CHANGES HERE %%%%%%%%%%%%%%%%%%%%%%%
   %% \addtocontents {lof}{\protect \addvspace {10\p@ }}%
   \addcontentsline {lof}{chapter}{\protect \numberline {\thechapter }#1}%
+  \addtocontents {lof}{\protect \nopagebreak}%
   %% \addtocontents {lot}{\protect \addvspace {10\p@ }}%
   \addcontentsline {lot}{chapter}{\protect \numberline {\thechapter }#1}%
+  \addtocontents {lot}{\protect \nopagebreak}%
   %%%%%%%%%%%%%% END CHANGES %%%%%%%%%%%%%%%%%%%%%%%%
   \if@twocolumn
     \@topnewpage [\@makechapterhead {#2}]%
