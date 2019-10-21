@@ -110,11 +110,23 @@
 % Chapter headings are numbered with roman numerals, capitalized,
 % horizontally centered on the page, and underlined
 
-% Capitalize
+% Uppercase Titles
+% The \MakeUppercase command is very delicate, and does not play with
+% hyperref at all. To handle this, define a command that will *just
+% work* in these cases.
+\newcommand\umlupper[1]{%
+\ifdefined\texorpdfstring%
+% hyperref has been loaded:
+\texorpdfstring{\MakeUppercase{#1}}{#1}%
+\else%
+{% hyperref has not been loaded:
+\MakeUppercase{#1}%
+}\fi%
+}
 \let\ORIGchapter\chapter
 \renewcommand*{\chapter}{\@ifstar\@umlchapterstar\@umlchapter}
-\newcommand*{\@umlchapter}[1]{\ORIGchapter{\protect\MakeUppercase{#1}}}
-\newcommand*{\@umlchapterstar}[1]{\ORIGchapter*{\protect\MakeUppercase{#1}}}
+\newcommand*{\@umlchapter}[1]{\ORIGchapter{\umlupper{#1}}}
+\newcommand*{\@umlchapterstar}[1]{\ORIGchapter*{\umlupper{#1}}}
 
 % Roman chapter numbering:
 \renewcommand{\thechapter}{\Roman{chapter}}
@@ -167,11 +179,11 @@
 
 %% BIBLIOGRAPHY
 % Change the default bibliography name
-\renewcommand{\bibname}{Literature Cited}
+\renewcommand{\bibname}{\umlupper{Literature Cited}}
 
 % Include in table of contents
 \let\ORIGbibliography\bibliography
-\renewcommand\bibliography[1]{\ORIGbibliography{#1}\addcontentsline{toc}{chapter}{\MakeUppercase{\bibname}}}
+\renewcommand\bibliography[1]{\ORIGbibliography{#1}\addcontentsline{toc}{chapter}{{\bibname}}}
 
 % Single spaced
 \let\ORIGthebibliography\thebibliography
@@ -180,9 +192,9 @@
 
 %% TABLE OF CONTENTS
 \RequirePackage{tocloft}
-\renewcommand*\contentsname{\protect\MakeUppercase{Contents}}
-\renewcommand*\listfigurename{\protect\MakeUppercase{Figures}}
-\renewcommand*\listtablename{\protect\MakeUppercase{Tables}}
+\renewcommand*\contentsname{\umlupper{Contents}}
+\renewcommand*\listfigurename{\umlupper{Figures}}
+\renewcommand*\listtablename{\umlupper{Tables}}
 
 %% Give a little more room to the chapter numbers
 \newlength\chapnumextra
@@ -195,12 +207,12 @@
 %% \cftaddtitleline does not insert an entry into the PDF index
 \renewcommand\cftlofprehook{%
   \phantomsection%
-  \addcontentsline{toc}{chapter}{\listfigurename}}
+  \addcontentsline{toc}{chapter}{{\listfigurename}}}
 \renewcommand\cftlotprehook{
   \phantomsection%
-  \addcontentsline{toc}{chapter}{\listtablename}}
+  \addcontentsline{toc}{chapter}{{\listtablename}}}
 %% Also add TOC to PDF index
-\renewcommand\cfttocprehook{\phantomsection\pdfbookmark{Contents}{umlthesistoc}}
+\renewcommand\cfttocprehook{\phantomsection\ifdefined\pdfbookmark{\pdfbookmark{\contentsname}{chap:tableofcontents}}\fi}
 
 %% Chapter headings in list of figures, tables. This will put /every/
 %% chapter in, regardless of whether it contains any tables or
@@ -230,9 +242,9 @@
 
 
 %% AUTHOR BIOGRAPHY
-\newenvironment{authorbio}[1][Author Biography]{%
+\newenvironment{authorbio}[1][\umlupper{Author Biography}]{%
   \chapter*{#1}%
-  \addcontentsline{toc}{chapter}{\MakeUppercase{#1}}}%
+  \addcontentsline{toc}{chapter}{{#1}}}%
 {}
 
 
@@ -251,12 +263,11 @@
 
 %% TITLE PAGE
 % All caps, so it's extra ugly
-\let\choosecase\MakeUppercase
+\let\choosecase\umlupper
 
 % Some macros to input information
 \newcommand*{\department}[1]{\gdef\@department{#1}}
 \newcommand*{\concentration}[1]{\gdef\@concentration{#1}}
-\concentration{\@department}
 \newcommand*{\supervisor}[1]{\gdef\@supervisor{#1}}
 \newcommand*{\supervisortitle}[1]{\gdef\@supervisortitle{#1}}
 \newcommand*{\supervisorposition}[1]{\gdef\@supervisorposition{#1}}
@@ -269,7 +280,8 @@
   \expandafter\gdef\csname @reader\roman{reader}\endcsname{#1}%
 }
 
-% default titles
+% default values
+\concentration{\@department}
 \supervisortitle{Thesis Supervisor}
 \supervisordegree{Ph.D.}
 \supervisorposition{Professor}
@@ -436,11 +448,4 @@
   
   \@supervisorposition, \@supervisordepartment
   \newpage
-}
-
-% https://github.com/umasscs/umassthesis/issues/1
-\RequirePackage[hidelinks]{hyperref}
-\pdfstringdefDisableCommands{%
-  \let\MakeUppercase\relax
-  \let\MakeLowercase\relax
 }
