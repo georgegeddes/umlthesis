@@ -100,7 +100,8 @@
 %%       Currently, this affects both Figures and Tables, so it should be
 %%       split into two flavors depending on \@captype, which is either
 %%       'figure' or 'table'.
-\renewcommand\@makecaption[2]{\vskip \abovecaptionskip \sbox \@tempboxa {\textsc{#1}: #2}\ifdim \wd \@tempboxa > \hsize \textsc{#1}: #2\par \else \global \@minipagefalse \hb@xt@ \hsize {\hfil \box \@tempboxa \hfil }\fi \vskip \belowcaptionskip} 
+% \renewcommand\@makecaption[2]{\vskip \abovecaptionskip \sbox \@tempboxa {\textsc{#1}: #2}\ifdim \wd \@tempboxa > \hsize \textsc{#1}: #2\par \else \global \@minipagefalse \hb@xt@ \hsize {\hfil \box \@tempboxa \hfil }\fi \vskip \belowcaptionskip}
+\RequirePackage[labelfont={sc,singlespacing},labelsep=colon,width=\textwidth]{caption}
 %% Continuous numering
 \RequirePackage{chngcntr}
 \counterwithout{figure}{chapter}
