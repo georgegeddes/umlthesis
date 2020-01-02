@@ -217,30 +217,33 @@
 
 %% Chapter headings in list of figures, tables. This will put /every/
 %% chapter in, regardless of whether it contains any tables or
-%% figures. My best solution for this so far is something like:
-%%  \immediate\write18{sed -ni -f remove-duplicate-chapters.sed build/main.lof}
-\def\@chapter[#1]#2{%
-  \ifnum \c@secnumdepth >\m@ne
-    \refstepcounter {chapter}%
-    \typeout {\@chapapp \space \thechapter .}%
-    \addcontentsline {toc}{chapter}{\protect \numberline {\thechapter }#1}%
-  \else
-    \addcontentsline {toc}{chapter}{#1}%
-  \fi
-  \chaptermark {#1}%
-  %%%%%%%%%%%%%% CHANGES HERE %%%%%%%%%%%%%%%%%%%%%%%
-  %% \addtocontents {lof}{\protect \addvspace {10\p@ }}%
-  \addcontentsline {lof}{chapter}{\protect \numberline {\thechapter }#1}%
-  \addtocontents {lof}{\protect \nopagebreak}%
-  %% \addtocontents {lot}{\protect \addvspace {10\p@ }}%
-  \addcontentsline {lot}{chapter}{\protect \numberline {\thechapter }#1}%
-  \addtocontents {lot}{\protect \nopagebreak}%
-  %%%%%%%%%%%%%% END CHANGES %%%%%%%%%%%%%%%%%%%%%%%%
-  \if@twocolumn
-    \@topnewpage [\@makechapterhead {#2}]%
-  \else
-    \@makechapterhead {#2}\@afterheading%
-  \fi%
+%% figures.
+% My best solution for this so far is something like:
+%   \immediate\write18{sed -ni -f remove-duplicate-chapters.sed build/main.lof}
+\RequirePackage{etoolbox}
+% Store chapter titles for later
+\newcommand*\chaptertitle{}
+\pretocmd{\@chapter}{\renewcommand*\chaptertitle{#1}}{%
+}{%
+  \ClassError{umlthesis}{Failed to patch '@chapter'. Chapter titles will not appear correctly in the list of figures or list of tables.}{}%
+}
+\newcounter{FiguresInChapter}[chapter]
+\newcounter{TablesInChapter}[chapter]
+\AfterEndEnvironment{figure}{%
+  \ifnumequal{\value{FiguresInChapter}}{0}{%
+    \stepcounter{FiguresInChapter}%
+    \addcontentsline {lof}{chapter}{\protect \numberline {\thechapter }\chaptertitle}%
+    \addtocontents {lof}{\protect \nopagebreak}%
+  }{%
+  }
+}
+\AtBeginEnvironment{table}{%
+  \ifnumequal{\value{TablesInChapter}}{0}{%
+    \stepcounter{TablesInChapter}%
+    \addcontentsline {lot}{chapter}{\protect \numberline {\thechapter }\chaptertitle}%
+    \addtocontents {lot}{\protect \nopagebreak}%
+  }{%
+  }
 }
 
 
