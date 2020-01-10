@@ -3,6 +3,13 @@
 % https://www.uml.edu/registrar/docs/thesis_guide.pdf
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{umlthesis}[01/23/2019]
+\PassOptionsToPackage{
+  letterpaper,
+  includefoot,
+  vmargin=1in,
+  hmarginratio=2:1,
+  textwidth=6in,
+}{geometry}
 
 \DeclareOption*{\PassOptionsToClass{\CurrentOption}{report}}
 
@@ -12,7 +19,7 @@
 
 \LoadClass{report}
 \RequirePackage{calc}
-%\RequirePackage{natbib}
+\RequirePackage{etoolbox}
 
 
 %% TYPING
@@ -26,10 +33,12 @@
 % Indent first line of paragraphs by 10 spaces
 \newlength{\spacewidth}
 \newlength{\fivespaces}
-\settowidth{\spacewidth}{\space}
-\setlength{\fivespaces}{5\spacewidth}
-\setlength{\parindent}{2\fivespaces}
-
+% Set these lengths inside the document so that the font is correct
+\AtBeginDocument{
+  \setlength{\spacewidth}{1\fontdimen2\font - .3\fontdimen4\font }
+  \setlength{\fivespaces}{5\spacewidth}
+  \setlength{\parindent}{2\fivespaces}
+}
 % Always indent the first paragraph of a section/chapter
 \RequirePackage{indentfirst}
 
@@ -49,12 +58,32 @@
 % Margins should be 1.5 in on the left and 1 in on all other sides.
 % Paper size is 8.5x11 in. 
 % Option includefoot makes footnotes respect the bottom margin
-\usepackage[letterpaper,left=1.5in,right=1in,top=1in,bottom=1in,includefoot]{geometry}
+% Specifying textwidth, textheight
 
 % "The first page of a new chapter should begin 2 in. from the top of the page."
 % My interpretation of this is that the heading begins 2 in from the top.
 \newcommand*{\chapterheading}{}
+\newcommand*\firstchaptersetup{
+  \ifnumgreater{\value{chapter}}{0}{
+    \global\booltrue{@maintext}
+    %% Only reset page numbers themselves on Chapter 1
+    %% (handy when \include'ing only later chapters)
+    \ifnumequal{\value{chapter}}{1}{
+      \ifnumodd{\value{page}}{}{
+        \thispagestyle{empty}\clearpage{
+          \pagestyle{empty}
+          \cleardoublepage
+        }
+      }
+      \setcounter{page}{1}
+    }{}
+    \pagenumbering{arabic}
+  }{}
+  % undefine this macro once it has been used
+  \ifbool{@maintext}{\let\firstchaptersetup\relax}{}
+}
 \newcommand*{\@makeanychapterhead}[2]{%
+  \firstchaptersetup
   \renewcommand*{\chapterheading}{\Huge \bfseries \underline{#1#2}}
   \vspace*{1in}%
   %% Uncomment below to make the text start 2 in down, rather than the heading
@@ -65,16 +94,7 @@
     \chapterheading \par\nobreak
     \vskip 40\p@
   }
-  %% On the first numbered chapter, reset the page numbering
-  \ifnum \value{chapter}>0
-  {\if@maintext\else            % Only do this part once
-    \global\@maintexttrue
-    \pagenumbering{arabic}
-    %% Only reset page numbers themselves on Chapter 1
-    \ifnum \value{chapter}=1
-    \setcounter{page}{1}
-    \fi
-  \fi}\fi }
+}
 \renewcommand*{\@makechapterhead}[1]{\@makeanychapterhead{\thechapter. }{#1}}  % Numbered chapters
 \renewcommand*{\@makeschapterhead}[1]{\@makeanychapterhead{}{#1}}  % Unnumbered chapters
   
@@ -138,40 +158,42 @@
 
 
 %% FOOTNOTES AND QUOTATIONS
-% Narrower footnote
-% First, we define our desired textwidth for footnotes
-%% \newlength\footnotewidth
-%% \setlength{\footnotewidth}{\textwidth - 10\spacewidth}
-%% \renewcommand{\@footnotetext}[1]{% This monster is copied from report.cls
-%% \insert \footins {\reset@font \footnotesize \interlinepenalty \interfootnotelinepenalty \splittopskip \footnotesep \splitmaxdepth \dp \strutbox \floatingpenalty \@MM \hsize \columnwidth \@parboxrestore \protected@edef \@currentlabel {\csname p@footnote\endcsname \@thefnmark }\color@begingroup%  Everything above this is default
-%% \centering\begin{minipage}{\footnotewidth} \singlespacing %  This line is added
-%% {\@makefntext {\rule \z@ \footnotesep \ignorespaces #1\@finalstrut \strutbox }\color@endgroup }%
-%% \end{minipage}% close the minipage.
-%% }}
+% Footnote spacing
+\newlength\footnotemargin
+\newlength\footnoteindent
+\AtBeginDocument{
+  \setlength\footnotemargin{\fivespaces}
+  \setlength{\footnoteindent}{\footnotemargin - 1.8em}
+  \setlength{\skip\footins}{\parskip + \baselineskip}
+}
 
-% Change the indentation of quotations
-\renewenvironment{quotation}
-               {\list{}{\leftmargin=\fivespaces%
-                        \rightmargin=\fivespaces%
-                        \itemindent=\fivespaces}%
-                \singlespacing \item\relax}
-               {\endlist}
-\renewenvironment{quote}% \quote is the unindented version, intended for short quotes.
-               {\list{}{\leftmargin=\fivespaces%
-                        \rightmargin=\fivespaces%
-                        \itemindent=0\p@}%
-                \singlespacing \item\relax}
-               {\endlist}
+% Add a parbox around the footnote text to control the width.
+\global\long\def\@makefntext#1{\hspace*{\footnoteindent}\noindent \hb@xt@ 1.8em{\hss \@makefnmark }\parbox[t]{\textwidth - 2\footnotemargin}{#1}}
+\def\@textbottom{ \vskip \z@ \@plus 999fil }
+\let\@texttop\relax
 
-% Footnote spacing. I think the current spacing is correct, but if not
-% edit this:
-%\addtolength{\skip\footins}{12pt}
-
-% Remove rule. \vfill pushes the footnotes to the bottom of the page
-\renewcommand{\footnoterule}{\vfill}
+% Remove the rule between text and footnotes
+\let\footnoterule\relax
 
 % Footnote numbering
 \renewcommand{\thefootnote}{\alph{footnote}}
+
+% Change the indentation of quotations
+\AtBeginDocument{
+  \renewenvironment{quotation}
+    {\list{}{\leftmargin=\fivespaces%
+             \rightmargin=\fivespaces%
+             \itemindent=\parindent}%
+     \singlespacing \item\relax}
+    {\endlist}
+  % \quote is the unindented version, intended for short quotes.
+  \renewenvironment{quote}
+    {\list{}{\leftmargin=\fivespaces%
+             \rightmargin=\fivespaces%
+             \itemindent=\z@}%
+     \singlespacing \item\relax}
+    {\endlist}
+}
 
 %% VERBATIM ENVIRONMENT
 %% Use single spacing for code blocks.
@@ -182,13 +204,20 @@
 % Change the default bibliography name
 \renewcommand{\bibname}{\umlupper{Literature Cited}}
 
-% Include in table of contents
-\let\ORIGbibliography\bibliography
-\renewcommand\bibliography[1]{\ORIGbibliography{#1}\addcontentsline{toc}{chapter}{{\bibname}}}
+% Include in table of contents; single spaced entries
+\AtBeginEnvironment{thebibliography}{%
+  \addcontentsline{toc}{chapter}{{\bibname}}
+  \singlespacing
+}
 
-% Single spaced
-\let\ORIGthebibliography\thebibliography
-\renewcommand\thebibliography[1]{\ORIGthebibliography{#1}\singlespacing}
+% Double spaces between references
+% Redefine item separation macros for natbib and biblatex.
+\AtBeginDocument{
+  % natbib:
+  \ifdeflength{\bibsep}{\setlength\bibsep{2\baselineskip + \parskip}}{}
+  % biblatex:
+  \ifdeflength{\bibitemsep}{\setlength\bibitemsep{2\baselineskip + \parskip}}{}
+}
 
 
 %% TABLE OF CONTENTS
@@ -220,7 +249,6 @@
 %% figures.
 % My best solution for this so far is something like:
 %   \immediate\write18{sed -ni -f remove-duplicate-chapters.sed build/main.lof}
-\RequirePackage{etoolbox}
 % Store chapter titles for later
 \newcommand*\chaptertitle{}
 \pretocmd{\@chapter}{\renewcommand*\chaptertitle{#1}}{%
@@ -455,3 +483,5 @@
   \@supervisorposition, \@supervisordepartment
   \newpage
 }
+
+\RequirePackage{geometry}
