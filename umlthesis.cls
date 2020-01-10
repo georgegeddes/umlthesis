@@ -212,11 +212,11 @@
 
 % Double spaces between references
 % Redefine item separation macros for natbib and biblatex.
-\AtBeginDocument{
+\AtEndPreamble{
   % natbib:
-  \ifdeflength{\bibsep}{\setlength\bibsep{2\baselineskip + \parskip}}{}
+  \ifdeflength{\bibsep}{\setlength\bibsep{\parsep}}{}
   % biblatex:
-  \ifdeflength{\bibitemsep}{\setlength\bibitemsep{2\baselineskip + \parskip}}{}
+  \ifdeflength{\bibitemsep}{\setlength\bibitemsep{\parsep}}{}
 }
 
 
