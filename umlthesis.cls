@@ -222,9 +222,9 @@
 
 %% TABLE OF CONTENTS
 \RequirePackage{tocloft}
-\renewcommand*\contentsname{\umlupper{Contents}}
-\renewcommand*\listfigurename{\umlupper{Figures}}
-\renewcommand*\listtablename{\umlupper{Tables}}
+\renewcommand*\contentsname{\umlupper{Table of Contents}}
+\renewcommand*\listfigurename{\umlupper{List of Figures}}
+\renewcommand*\listtablename{\umlupper{List of Tables}}
 
 %% Give a little more room to the chapter numbers
 \newlength\chapnumextra
