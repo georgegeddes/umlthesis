@@ -3,24 +3,25 @@
 % https://www.uml.edu/registrar/docs/thesis_guide.pdf
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{umlthesis}[01/23/2019]
+
+\DeclareOption*{\PassOptionsToClass{\CurrentOption}{report}}
+
+%% MARGINS
+% Margins should be 1.5 in on the left and 1 in on all other sides.
+% Paper size is 8.5x11 in.
 \PassOptionsToPackage{
-  letterpaper,
-  includefoot,
   vmargin=1in,
   hmarginratio=2:1,
   textwidth=6in,
 }{geometry}
 
-\DeclareOption*{\PassOptionsToClass{\CurrentOption}{report}}
-
-\ExecuteOptions{12pt}
+\ExecuteOptions{letterpaper,12pt}
 
 \ProcessOptions\relax
 
 \LoadClass{report}
 \RequirePackage{calc}
 \RequirePackage{etoolbox}
-
 
 %% TYPING
 % Double space the document
@@ -53,12 +54,6 @@
 \renewcommand{\LARGE}{\normalsize}
 \renewcommand{\huge}{\normalsize}
 
-
-%% MARGINS
-% Margins should be 1.5 in on the left and 1 in on all other sides.
-% Paper size is 8.5x11 in. 
-% Option includefoot makes footnotes respect the bottom margin
-% Specifying textwidth, textheight
 
 % "The first page of a new chapter should begin 2 in. from the top of the page."
 % My interpretation of this is that the heading begins 2 in from the top.
