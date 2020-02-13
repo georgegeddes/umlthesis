@@ -302,8 +302,10 @@
 
 %% ABSTRACT
 \renewenvironment{abstract}{%
-  \abstracttitlepage
+  \makeabstracttitlepage
   \chapter*{\abstractname}
+  % make sure the page number is correct
+  \if@twocolumn \else \ifnumless{\value{page}}{4}{\setcounter{page}{4}}{} \fi
 }{}
 
 %% ACKNOWLEDGMENTS
@@ -314,23 +316,29 @@
 
 
 %% TITLE PAGE
-% All caps, so it's extra ugly
-\let\choosecase\umlupper
+% \choosecase allows the case of all these macros to be set at use
+\let\choosecase\relax
 
 % Some macros to input information
-\newcommand*{\department}[1]{\gdef\@department{#1}}
-\newcommand*{\concentration}[1]{\gdef\@concentration{#1}}
-\newcommand*{\supervisor}[1]{\gdef\@supervisor{#1}}
-\newcommand*{\supervisortitle}[1]{\gdef\@supervisortitle{#1}}
-\newcommand*{\supervisorposition}[1]{\gdef\@supervisorposition{#1}}
-\newcommand*{\supervisordegree}[1]{\gdef\@supervisordegree{#1}}
-\newcommand*{\supervisordepartment}[1]{\gdef\@supervisordepartment{#1}}
-\newcommand*{\chair}[1]{\gdef\@chair{#1}}
-\newcounter{reader}
-\newcommand*{\reader}[1]{%
-  \stepcounter{reader}%
-  \expandafter\gdef\csname @reader\roman{reader}\endcsname{#1}%
-}
+\let\@department\empty
+\let\@concentration\empty
+\let\@superversor\empty
+\let\@supervisortitle\empty
+\let\@supervisorposition\empty
+\let\@supervisordegree\empty
+\let\@supervisordepartment\empty
+\let\@chair\empty
+\let\comittee\empty
+\newcommand*{\department}[1]{\gdef\@department{\choosecase{#1}}}
+\newcommand*{\concentration}[1]{\gdef\@concentration{\choosecase{#1}}}
+\newcommand*{\supervisor}[1]{\gdef\@supervisor{\choosecase{#1}}}
+\newcommand*{\supervisortitle}[1]{\gdef\@supervisortitle{\choosecase{#1}}}
+\newcommand*{\supervisorposition}[1]{\gdef\@supervisorposition{\choosecase{#1}}}
+\newcommand*{\supervisordegree}[1]{\gdef\@supervisordegree{\choosecase{#1}}}
+\newcommand*{\supervisordepartment}[1]{\gdef\@supervisordepartment{\choosecase{#1}}}
+\newcommand*{\chair}[1]{\gdef\@chair{\choosecase{#1}}}
+\newcommand*{\reader}[1]{\listgadd{\comittee}{\choosecase{#1}}}
+\let\comitteemember\reader
 
 % default values
 \concentration{\@department}
@@ -338,168 +346,150 @@
 \supervisordegree{Ph.D.}
 \supervisorposition{Professor}
 \supervisordepartment{\@department}
-\newcommand*\@chairtitle{Department Chair}
+\newcommand*\@chairtitle{\choosecase{Department Chair}}
 
 % The current degree(s)
-\newcounter{degrees}
-\newcommand*{\degree}[1]{\stepcounter{degrees}%
-\expandafter\gdef\csname @deg\roman{degrees}\endcsname{#1}%
-\ifnum \value{degrees} =1\relax\long\gdef\@degree{\@degi}%
-\else%
-\xdef\@degree{\@degree\ AND \csname @deg\roman{degrees}\endcsname}%
-\fi}
-\newcommand*{\@degreeword}{\ifnum \value{degrees} >1 degrees\else degree\fi\ }
-\newcounter{degnum}
+\newcommand*\@degreeword{\choosecase{degree}}
+\newcommand*\@degreesword{\choosecase{degrees}}
+\newcommand*\@degreeand{\choosecase{and}}
+
+\let\@newdegrees\empty
+\newcommand*{\degree}[1]{
+  \ifdefempty{\@newdegrees}{
+    \listgadd{\@newdegrees}{\choosecase{#1}}
+  }{
+    \global\let\@degreeword\@degreesword
+    \listgadd{\choosecase{\@degreeand\ #1}}{\@newdegrees}
+  }
+}
+
+\newcommand{\printdegrees}[1][\do]{\forlistloop{#1}{\@newdegrees}}
+\let\printdegree\printdegrees
 
 % Previous degrees are a little trickier
-\newcounter{prevdegrees}
+\let\@prevdegrees\empty
 \newcommand*\previousdegree[3]{% store the degree to a numbered macro
-\stepcounter{prevdegrees}%
-\expandafter\gdef\csname @prevdegree\roman{prevdegrees}\endcsname{#1\ {#2} (#3)}\relax%
-\ifnum \value{prevdegrees} =1\relax%
-\long\gdef\@prevdegrees{\@prevdegreei\relax}%
-\else%
-\long\xdef\@prevdegrees{\@prevdegrees\par\relax\csname @prevdegree\roman{prevdegrees}\endcsname}%
-\fi%
+  \listgadd{\@prevdegrees}{\choosecase{#1\ {#2} (#3)}}
 }
-% \newcommand{\@prevdegrees}{% Print each degree that has been stored.
-% \stepcounter{prevdegreenum}%
-% \ifcsname @prevdegree\roman{prevdegreenum}\endcsname%
-%   \ifnum \value{prevdegreenum} =1%
-%     \@prevdegreei % Print the first with no \par
-%   \else%
-%     \par \csname @prevdegree\roman{prevdegreenum}\endcsname%
-%   \fi%
-%   \@prevdegrees % recursively call until we reach an undefined \@prevdegreen
-% \else%
-%   \setcounter{prevdegreenum}{0}%
-% \fi}%
+\newcommand\printpreviousdegrees[1][\mbox]{\forlistloop{#1}{\@prevdegrees}}
+\let\printprevdegree\printpreviousdegrees
 
 % \let\ORIGmaketitle\maketitle
 % \def\maketitle{\pagenumbering{roman}\ORIGmaketitle}
-\newcommand*\university{University of Massachusetts Lowell}
+\newcommand*\university{\choosecase{University of Massachusetts Lowell}}
 \newcommand*{\uni}{UML}
 
 %% Title Page
 \newlength\siglinewidth
-\setlength\siglinewidth{0.8\textwidth}
+\setlength\siglinewidth{0.6\textwidth}
+\let\namefont\textsc
 \newcommand*{\sigline}[2][]{
-  % Begin with some room for the signature
-  \vspace{1cm}
-
-  % Create the signature box with name underneath
   \begin{minipage}[t][][l]{\siglinewidth}
+    \phantom{\Huge SIGNATURE}
+    
     \hrulefill
-
-    {#2\\
-      % Print the optional title below the name without adding vertical space
-      #1\vspace*{-\baselineskip}\\}
+    
+    {\small \namefont{#2} \hfill #1}
   \end{minipage}
-  % Insert a flexible space after the signature block
-  \vskip 12pt plus 36pt
+}
+
+\newenvironment{siggroup}[1]{%
+  \begin{singlespace}%
+  \makebox[\siglinewidth][l]{\hspace*{-7mm} #1}%
+}{%
+\end{singlespace}%
+}
+
+\AtBeginEnvironment{titlepage}{
+  \setlength{\parskip}{ 12pt plus 555fil }
+  \setlength{\bigskipamount}{ 6pt plus 222fil }
+  \setlength{\medskipamount}{ 3pt plus 111fil }
+  \let\namefont\textsc
+  \let\choosecase\umlupper
 }
 
 \renewcommand*{\maketitle}{
   \begin{titlepage}
-    \let\name\textsc
+    \let\MU\MakeUppercase
     \centering
-    \singlespacing
-    \vspace*{0pt}\vfill
-    {\Huge \choosecase{\@title}}\par
+    \onehalfspacing
 
-    \vspace{\baselineskip}
+    {\Huge \MU\@title }
 
-    \choosecase{by}
-
-    \vspace{\baselineskip}
-
-    \choosecase{\@author}
+    \uppercase{
+                                by                                  \\[\bigskipamount]
+                                                                    %%
+                           \MU\@author                              \\[\smallskipamount]
+                      \printpreviousdegrees                         \\[\bigskipamount]
+                                                                    %%
+               Submitted in partial fulfillment of the              \\
+             requirements for the \@degreeword\ of \printdegree     \\
+                       Department of \@department                   \\
+                           \university
+    }
     
-    \choosecase{\@prevdegrees}
 
-    \vspace{\baselineskip}
+    % Signatures
+    \let\choosecase\relax
 
-    \vfill
+    \begin{siggroup}{Author}
+      \sigline[\@date]{\@author}
+    \end{siggroup}
 
-    \choosecase{Submitted in partial fulfillment of the requirements}\\
-    \choosecase{for the \@degreeword of \@degree}
+    \begin{siggroup}{Thesis Committee}
+      \sigline[\@supervisortitle]{\@supervisor}
+      \forlistloop{\sigline}{\comittee}
+    \end{siggroup}
 
-    \vspace{1.5\baselineskip}
-    
-    \choosecase{Department of \@department}
-
-    \vspace{1.5\baselineskip}
-
-    \choosecase{\university}
-    
-    \vfill
-
-    \raggedright
-    \hspace*{1cm}\hbox{Author}
-
-    \centering
-    \sigline{\name{\@author}\hfill\@date}
-
-    \raggedright
-    \hspace*{1cm}\hbox{Thesis Committee}
-
-    \centering
-    \sigline[\@supervisortitle]{\name{\@supervisor}}
-    \ifdefined\@readeri\sigline{\name{\@readeri}}\fi
-    \ifdefined\@readerii\sigline{\name{\@readerii}}\fi
-    \ifdefined\@readeriii\sigline{\name{\@readeriii}}\fi
-    \ifdefined\@readeriv\sigline{\name{\@readeriv}}\fi
-    \ifdefined\@readerv\sigline{\name{\@readerv}}\fi
-
-    %% \vspace{\baselineskip}
-    %% \makebox[\siglinewidth][l]{Accepted by}
-    
-    %% \sigline[\@chairtitle]{\name{\@chair}}
+    % \begin{siggroup}{Accepted by}
+    %   \sigline[\@chairtitle]{\@chair}
+    % \end{siggroup}
   \end{titlepage}
 }
 
-\newcommand*\@degreeyear{2019}
-\newcommand*\abstracttitlepage{
-  \clearpage
+\newcommand*\@degreeyear{2020}
+\newenvironment{abstracttitlepage}{
+  % copy \titlepage but don't set page number
+    \clearpage{\thispagestyle{empty} \cleardoublepage}
+  \stepcounter{page}
   \thispagestyle{empty}
   \centering
   \singlespacing
-  \vspace*{1in}
-  {\Huge \choosecase{\@title}}
-  
-  \vspace{\baselineskip}
-  
-  \choosecase{by}
-
-  \vspace{\baselineskip}
-
-  \choosecase{\@author}
-
-  \vspace{2\baselineskip}
-
-  \choosecase{Abstract of a dissertation submitted to the faculty of the}
-
-  \choosecase{Department of \@department}
-
-  \choosecase{in partial fulfillment of the requirements}
-  \vspace{2\baselineskip}
-  
-  \choosecase{for the \@degreeword of}
-
-  \choosecase{\@degree}
-
-  \choosecase{\@concentration}
-
-  \choosecase{\university}
-
-  \choosecase{\@degreeyear}
-
-  \vspace{2\baselineskip}
-  \raggedright
-  Dissertation Supervisor: \@supervisor, \@supervisordegree
-  
-  \@supervisorposition, \@supervisordepartment
-  \newpage
+  \let\choosecase\umlupper
+}{
 }
+\newcommand*\makeabstracttitlepage{
+  \begin{abstracttitlepage}
+    \let\MU\MakeUppercase
+    \addtolength{\parskip}{2\baselineskip}
+    \vspace*{1in}
+    {\Huge \MU\@title }
 
-\RequirePackage{geometry}
+    \uppercase{
+                           by 
+
+                      \MU\@author
+  
+
+    Abstract of a dissertation submitted to the faculty of the \\
+                 Department of \@department
+
+
+               in partial fulfillment of the \\
+             requirements for the \@degreeword of \\
+                        \printdegree \\
+                     \@concentration \\
+                       \university \\
+                       \@degreeyear
+
+    }
+  
+
+    \let\choosecase\relax
+    \raggedright
+
+    Dissertation Supervisor: \@supervisor, \@supervisordegree \\
+    \@supervisorposition, \@supervisordepartment
+
+  \end{abstracttitlepage}
+}
