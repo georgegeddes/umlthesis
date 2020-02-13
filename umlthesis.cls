@@ -144,13 +144,11 @@
 % hyperref at all. To handle this, define a command that will *just
 % work* in these cases.
 \newcommand\umlupper[1]{%
-\ifdefined\texorpdfstring%
-% hyperref has been loaded:
-\texorpdfstring{\MakeUppercase{#1}}{#1}%
-\else%
-{% hyperref has not been loaded:
+\ifdef{\texorpdfstring}{% hyperref has been loaded:
+\texorpdfstring{\MakeUppercase{#1}}{#1}
+}{% hyperref has not been loaded:
 \MakeUppercase{#1}%
-}\fi%
+}%
 }
 \let\ORIGchapter\chapter
 \renewcommand*{\chapter}{\@ifstar\@umlchapterstar\@umlchapter}
@@ -172,7 +170,7 @@
 \AtBeginDocument{
   \setlength\footnotemargin{\fivespaces}
   \setlength{\footnoteindent}{\footnotemargin - 1.8em}
-  \setlength{\skip\footins}{\parskip + \baselineskip}
+  \setlength{\skip\footins}{\parskip + 2\baselineskip}
 }
 
 % Add a parbox around the footnote text to control the width.
@@ -261,7 +259,7 @@
 \newcommand*\chaptertitle{}
 \pretocmd{\@chapter}{\renewcommand*\chaptertitle{#1}}{%
 }{%
-  \ClassError{umlthesis}{Failed to patch '@chapter'. Chapter titles will not appear correctly in the list of figures or list of tables.}{}%
+  \ClassError{umlthesis}{Failed to patch \noexpand \@chapter. Chapter titles will not appear correctly in the list of figures or list of tables.}{}%
 }
 \newcounter{FiguresInChapter}[chapter]
 \newcounter{TablesInChapter}[chapter]
