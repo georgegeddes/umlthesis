@@ -4,17 +4,12 @@
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{umlthesis}[01/23/2019]
 
+\newif\if@umlcentering
+\DeclareOption{centering}{\@umlcenteringtrue}
+
 \DeclareOption*{\PassOptionsToClass{\CurrentOption}{report}}
 
-%% MARGINS
-% Margins should be 1.5 in on the left and 1 in on all other sides.
-% Paper size is 8.5x11 in.
-\PassOptionsToPackage{
-  vmargin=1in,
-  hmarginratio=2:1,
-  textwidth=6in,
-}{geometry}
-
+% Default geometry
 \ExecuteOptions{letterpaper,12pt}
 
 \ProcessOptions\relax
@@ -22,6 +17,17 @@
 \LoadClass{report}
 \RequirePackage{calc}
 \RequirePackage{etoolbox}
+
+%% MARGINS
+% Margins should be 1.5 in on the left and 1 in on all other sides.
+% Paper size is 8.5x11 in.
+\RequirePackage{geometry}
+\geometry{vmargin=1in,textwidth=6in}
+\ifbool{@umlcentering}{
+  \geometry{bindingoffset=0in,centering} 
+}{
+  \geometry{bindingoffset=0.5in}
+}
 
 %% TYPING
 % Double space the document
@@ -45,52 +51,53 @@
 
 %% Set chapter heading size (Huge) to 14 pt and all others to 12 pt
 \renewcommand{\Huge}{\fontsize{14}{16.8}\selectfont}
-\renewcommand{\footnotesize}{\normalsize}
-\renewcommand{\scriptsize}{\normalsize}
-\renewcommand{\small}{\fontsize{11}{13.2}}
-\renewcommand{\tiny}{\fontsize{8}{9.6}}
-\renewcommand{\large}{\normalsize}
-\renewcommand{\Large}{\normalsize}
-\renewcommand{\LARGE}{\normalsize}
 \renewcommand{\huge}{\normalsize}
+\renewcommand{\LARGE}{\normalsize}
+\renewcommand{\Large}{\normalsize}
+\renewcommand{\large}{\normalsize}
+\renewcommand{\small}{\fontsize{10}{12}\selectfont}
+\renewcommand{\footnotesize}{\normalsize}
+% \renewcommand{\scriptsize}{\normalsize}
+\renewcommand{\tiny}{\fontsize{6}{7.2}\selectfont}
 
 
 % "The first page of a new chapter should begin 2 in. from the top of the page."
 % My interpretation of this is that the heading begins 2 in from the top.
-\newcommand*{\chapterheading}{}
 \newcommand*\firstchaptersetup{
   \ifnumgreater{\value{chapter}}{0}{
     \global\booltrue{@maintext}
     %% Only reset page numbers themselves on Chapter 1
     %% (handy when \include'ing only later chapters)
-    \ifnumequal{\value{chapter}}{1}{
-      \ifnumodd{\value{page}}{}{
-        \thispagestyle{empty}\clearpage{
-          \pagestyle{empty}
-          \cleardoublepage
-        }
+    \ifnumodd{\value{page}}{}{
+      \thispagestyle{empty}\clearpage{
+        \pagestyle{empty}
+        \cleardoublepage
       }
-      \setcounter{page}{1}
-    }{}
+    }
     \pagenumbering{arabic}
+    \ifnumequal{\value{chapter}}{1}{\setcounter{page}{1}}{}
   }{}
   % undefine this macro once it has been used
-  \ifbool{@maintext}{\let\firstchaptersetup\relax}{}
+  \ifbool{@maintext}{\global\let\firstchaptersetup\relax}{}
+}
+\newcommand{\chapterheadingfont}[1]{\Huge \bfseries \underline{#1}}
+\apptocmd\appendix{
+  \patchcmd{\@makechapterhead}{\thechapter.}{\umlupper{\appendixname} \thechapter.}{}{}
+}{}{
+  \ClassWarning{umlthesis}{Error prefixing \noexpand\@makechapterhead with \noexpand\appendixname.}
 }
 \newcommand*{\@makeanychapterhead}[2]{%
-  \firstchaptersetup
-  \renewcommand*{\chapterheading}{\Huge \bfseries \underline{#1#2}}
   \vspace*{1in}%
   %% Uncomment below to make the text start 2 in down, rather than the heading
   % \newlength{\chapterheadingheight}
   % \settoheight{\chapterheadingheight}{\chapterheading}
   % \vskip -40\p@ \vskip -\chapterheadingheight
   {\parindent \z@ \centering \normalfont \singlespacing
-    \chapterheading \par\nobreak
+    \chapterheadingfont{#1#2} \par\nobreak
     \vskip 40\p@
   }
 }
-\renewcommand*{\@makechapterhead}[1]{\@makeanychapterhead{\thechapter. }{#1}}  % Numbered chapters
+\renewcommand*{\@makechapterhead}[1]{\firstchaptersetup \@makeanychapterhead{\thechapter. }{#1}}  % Numbered chapters
 \renewcommand*{\@makeschapterhead}[1]{\@makeanychapterhead{}{#1}}  % Unnumbered chapters
   
 
