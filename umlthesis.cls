@@ -215,6 +215,18 @@
   \addcontentsline{toc}{chapter}{{\bibname}}
   \singlespacing
 }
+\AtEndPreamble{
+  \ifdef{\defbibheading}{
+    \ClassWarning{umlthesis}{Defining biblatex bibliography headings "bibliography" and "bibintoc"}
+    \defbibheading{bibliography}[\bibname]{%
+      \chapter*{#1}%
+    }
+    \defbibheading{bibintoc}[\bibname]{%
+      \chapter*{#1}%
+      \addcontentsline{toc}{chapter}{\umlupper{#1}}
+    }
+  }{}
+}
 
 % Double spaces between references
 % Redefine item separation macros for natbib and biblatex.
