@@ -111,11 +111,17 @@
 
 \renewcommand*{\ps@plain}{
   \renewcommand*{\@oddfoot}{\if@maintext\empty\else \hfil \em \thepage \hfil \fi}
-  \renewcommand*{\@evenhead}{\if@maintext \rm \thepage\hfil\sl\leftmark\hbox {} \fi}	%
-  \renewcommand*{\@oddhead}{\if@maintext \hbox{}\sl\rightmark \hfil \rm\thepage \fi}	%
-  \renewcommand*{\@evenfoot}{\@oddfoot}
+  \renewcommand*{\@evenhead}{\if@maintext \rm \thepage \fi \hfil\sl\leftmark\hbox {}}	%
+  \renewcommand*{\@oddhead}{\hbox{}\sl\rightmark \hfil \if@maintext \rm\thepage \fi}	%
+  \let\@evenfoot\@oddfoot
 }
 \pagestyle{plain} % reload the plain page style to apply changes
+\newcommand*{\ps@chapterpage}{
+  \renewcommand*{\@oddfoot}{\hfil \thepage \hfil}
+  \let\@evenfoot\@oddfoot
+  \let\@oddhead\empty
+  \let\@evenhead\@oddhead
+}
 
 %% TABLES AND FIGURES
 %% TODO: Edit \@makecaption to make Table numbers centered and underlined.
