@@ -410,16 +410,16 @@
 
 \renewcommand*{\maketitle}{
   \begin{titlepage}
-    \let\MU\MakeUppercase
+    \let\UP\MakeUppercase
     \centering
     \onehalfspacing
 
-    {\Huge \MU\@title }
+    {\Huge \UP\@title }
 
     \uppercase{
                                 by                                  \\[\bigskipamount]
                                                                     %%
-                           \MU\@author                              \\[\smallskipamount]
+                           \UP\@author                              \\[\smallskipamount]
                       \printpreviousdegrees                         \\[\bigskipamount]
                                                                     %%
                Submitted in partial fulfillment of the              \\
@@ -460,15 +460,15 @@
 }
 \newcommand*\makeabstracttitlepage{
   \begin{abstracttitlepage}
-    \let\MU\MakeUppercase
+    \let\UP\MakeUppercase
     \addtolength{\parskip}{2\baselineskip}
     \vspace*{1in}
-    {\Huge \MU\@title }
+    {\Huge \UP\@title }
 
     \uppercase{
                            by 
 
-                      \MU\@author
+                      \UP\@author
   
 
     Abstract of a dissertation submitted to the faculty of the \\
