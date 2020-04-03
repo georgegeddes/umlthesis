@@ -303,9 +303,8 @@
 %% ABSTRACT
 \renewenvironment{abstract}{%
   \makeabstracttitlepage
+  \gdef\thepage{\@roman\c@page}
   \chapter*{\abstractname}
-  % make sure the page number is correct
-  \if@twocolumn \else \ifnumless{\value{page}}{4}{\setcounter{page}{4}}{} \fi
 }{}
 
 %% ACKNOWLEDGMENTS
@@ -409,6 +408,7 @@
 }
 
 \renewcommand*{\maketitle}{
+  \pagenumbering{Alph}
   \begin{titlepage}
     \let\UP\MakeUppercase
     \centering
@@ -451,7 +451,7 @@
 \newenvironment{abstracttitlepage}{
   % copy \titlepage but don't set page number
     \clearpage{\thispagestyle{empty} \cleardoublepage}
-  \stepcounter{page}
+  \pagenumbering{roman}
   \thispagestyle{empty}
   \centering
   \singlespacing
