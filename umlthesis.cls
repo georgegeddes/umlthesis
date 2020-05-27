@@ -19,14 +19,14 @@
 \RequirePackage{etoolbox}
 
 %% MARGINS
-% Margins should be 1.5 in on the left and 1 in on all other sides.
+% Margins should be at least 1.25in on the left and right and 1in in on top and bottom
 % Paper size is 8.5x11 in.
 \RequirePackage{geometry}
-\geometry{vmargin=1in,textwidth=6in}
+\geometry{vmargin=1in,hmargin=1.25in}
 \ifbool{@umlcentering}{
   \geometry{bindingoffset=0in,centering} 
 }{
-  \geometry{bindingoffset=0.5in}
+  \geometry{bindingoffset=0.0in}
 }
 
 %% TYPING
@@ -69,13 +69,14 @@
     %% Only reset page numbers themselves on Chapter 1
     %% (handy when \include'ing only later chapters)
     \ifnumodd{\value{page}}{}{
-      \thispagestyle{empty}\clearpage{
+      \clearpage{
         \pagestyle{empty}
         \cleardoublepage
       }
     }
     \pagenumbering{arabic}
     \ifnumequal{\value{chapter}}{1}{\setcounter{page}{1}}{}
+    \pagestyle{plain}
   }{}
   % undefine this macro once it has been used
   \ifbool{@maintext}{\global\let\firstchaptersetup\relax}{}
@@ -110,9 +111,9 @@
 \pagenumbering{roman}  % Begin the document with lowercase roman numbers
 
 \renewcommand*{\ps@plain}{
-  \renewcommand*{\@oddfoot}{\if@maintext\empty\else \hfil \em \thepage \hfil \fi}
-  \renewcommand*{\@evenhead}{\if@maintext \rm \thepage \fi \hfil\sl\leftmark\hbox {}}	%
-  \renewcommand*{\@oddhead}{\hbox{}\sl\rightmark \hfil \if@maintext \rm\thepage \fi}	%
+  \renewcommand*{\@oddfoot}{\hfil \if@maintext \rm \else \em \fi \thepage \hfil}
+  \renewcommand*{\@evenhead}{\hfil\sl\leftmark\hbox {}}	%
+  \renewcommand*{\@oddhead}{\hbox{}\sl\rightmark \hfil}	%
   \let\@evenfoot\@oddfoot
 }
 \pagestyle{plain} % reload the plain page style to apply changes
@@ -130,6 +131,8 @@
 %%       'figure' or 'table'.
 % \renewcommand\@makecaption[2]{\vskip \abovecaptionskip \sbox \@tempboxa {\textsc{#1}: #2}\ifdim \wd \@tempboxa > \hsize \textsc{#1}: #2\par \else \global \@minipagefalse \hb@xt@ \hsize {\hfil \box \@tempboxa \hfil }\fi \vskip \belowcaptionskip}
 \RequirePackage[labelfont={sc,singlespacing},labelsep=colon,width=\textwidth]{caption}
+\DeclareCaptionLabelFormat{underline}{\hbox{}\hfill\underline{#1~#2}\hfill\hbox{}}
+\captionsetup[table]{labelsep=newline,labelformat=underline}
 %% Continuous numering
 \RequirePackage{chngcntr}
 \counterwithout{figure}{chapter}
@@ -399,16 +402,29 @@
 \end{singlespace}%
 }
 
-\AtBeginEnvironment{titlepage}{
-  \setlength{\parskip}{ 12pt plus 555fil }
+
+\renewenvironment{titlepage}{%
+  \if@twocolumn
+  \@restonecoltrue \onecolumn
+  \else
+  \@restonecolfalse
+  \newpage
+  \fi
+  \thispagestyle{empty}
+  \setlength{\parskip}{ 14pt plus 555fil }
   \setlength{\bigskipamount}{ 6pt plus 222fil }
   \setlength{\medskipamount}{ 3pt plus 111fil }
   \let\namefont\textsc
   \let\choosecase\umlupper
+}{
+  \if@restonecol
+  \twocolumn
+  \else
+  \newpage
+  \fi
 }
 
-\renewcommand*{\maketitle}{
-  \pagenumbering{Alph}
+\newcommand*{\makesignatures}{
   \begin{titlepage}
     \let\UP\MakeUppercase
     \centering
@@ -447,40 +463,75 @@
   \end{titlepage}
 }
 
-\newcommand*\@degreeyear{2020}
+\def\@thesisword{Dissertation}
+\def\@graddate{May 2020}
+\def\@program{Physics and Applied Physics Program}
+\renewcommand*\maketitle{
+  \begin{titlepage}
+    \let\UP\MakeUppercase
+    \centering
+    \onehalfspacing
+    \vspace*{0.5in}
+
+    {\Huge \UP\@title }
+
+    A \@thesisword\ Presented \\
+    by \\
+    \@author
+
+
+    Submitted to the College of Sciences, \\
+    University of Massachusetts Lowell, \\
+    in partial fulfillment of the requirements for the degree of
+
+    \UP{\printdegree} \\
+    \@graddate
+
+    \@program
+  \end{titlepage}
+}
+
+\newcommand*\makecopyright{
+  \begin{titlepage}
+    \vspace*{1in}
+    \Huge
+    \centering
+    \textcopyright\ 2020\ \@author \\
+    All rights reserved
+    \vfill
+  \end{titlepage}
+}
+
 \newenvironment{abstracttitlepage}{
   % copy \titlepage but don't set page number
-    \clearpage{\thispagestyle{empty} \cleardoublepage}
-  \pagenumbering{roman}
-  \thispagestyle{empty}
-  \centering
+  \clearpage{\thispagestyle{empty} \cleardoublepage}
+  \begin{titlepage} 
+  \setlength{\parskip}{ 14pt plus 555fil }
   \singlespacing
-  \let\choosecase\umlupper
+  \centering
 }{
+  \end{titlepage}
 }
 \newcommand*\makeabstracttitlepage{
   \begin{abstracttitlepage}
     \let\UP\MakeUppercase
-    \addtolength{\parskip}{2\baselineskip}
-    \vspace*{1in}
+    % \addtolength{\parskip}{2\baselineskip}
+    \centering
+    \vspace*{0.5in}
     {\Huge \UP\@title }
 
     \uppercase{
-                           by 
-
+                           by \\
                       \UP\@author
   
 
     Abstract of a dissertation submitted to the faculty of the \\
-                 Department of \@department
-
-
-               in partial fulfillment of the \\
-             requirements for the \@degreeword of \\
-                        \printdegree \\
-                     \@concentration \\
-                       \university \\
-                       \@degreeyear
+                 Department of \@department \\
+        in partial fulfillment of the requirements \\
+                  for the \@degreeword of \printdegree \\
+                      \@concentration \\
+                        \university \\
+                        \@graddate \bigskip
 
     }
   
