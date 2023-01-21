@@ -21,10 +21,3 @@ of your thesis or somewhere in your TeX path (`kspewhich tex`).
   \usepackage{newtxtext}
   \usepackage{newtxmath}
   ```
-
-## TODO ##
-
-	- Table numbers should be centered and underlined.
-	- Table of Contents, List of Figures, List of Tables should be formatted with upper case titles, I think.
-	- Title Page.
-	- Abstract Title Page

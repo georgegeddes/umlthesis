@@ -341,6 +341,9 @@
 \newcommand*{\chair}[1]{\gdef\@chair{\choosecase{#1}}}
 \newcommand*{\reader}[1]{\listgadd{\comittee}{\choosecase{#1}}}
 \let\comitteemember\reader
+\renewcommand*{\date}[1]{%
+  \gdef\@date{#1}
+}
 
 % default values
 \concentration{\@department}
@@ -426,7 +429,7 @@
 
 \newcommand*{\makesignatures}{
   \begin{titlepage}
-    \let\UP\MakeUppercase
+    \let\UP\relax
     \centering
     \onehalfspacing
 
@@ -449,7 +452,7 @@
     \let\choosecase\relax
 
     \begin{siggroup}{Author}
-      \sigline[\@date]{\@author}
+      \sigline[\@defensedate]{\@author}
     \end{siggroup}
 
     \begin{siggroup}{Thesis Committee}
@@ -463,9 +466,22 @@
   \end{titlepage}
 }
 
-\def\@thesisword{Dissertation}
-\def\@graddate{May 2020}
-\def\@program{Physics and Applied Physics Program}
+\def\dissertationword{Dissertation}
+\providecommand*\@graddate{\ifcase\month\or
+  January\or February\or March\or April\or May\or June\or
+  July\or August\or September\or October\or November\or December\fi
+  \space\number\year}
+\newcommand*\graddate[1]{\renewcommand*\@graddate{#1}}
+\providecommand*\@defensedate{\@date}
+\newcommand*\defensedate[1]{\renewcommand*\@defensedate{#1}}
+\providecommand\@program{Physics and Applied Physics}
+\providecommand\@college{College of Sciences}
+\renewcommand*\date[1]{
+  \renewcommand*\@date{#1}
+  \renewcommand*\@defensedate{#1}
+  \renewcommand*\@graddate
+}
+\newcommand\degreeprogram[1]{\renewcommand\@program{#1}}
 \renewcommand*\maketitle{
   \begin{titlepage}
     \let\UP\MakeUppercase
@@ -475,19 +491,21 @@
 
     {\Huge \UP\@title }
 
-    A \@thesisword\ Presented \\
-    by \\
-    \@author
+    \UP{A \dissertationword\ Presented} \\
+    \UP{by} \\
+    \UP{\@author}
 
+    \UP{ Submitted to the \@college, } \\
+    \UP{ University of Massachusetts Lowell, }\\
+    \UP{ in partial fulfillment of the requirements }\\
+    \UP{ for the degree of }
 
-    Submitted to the College of Sciences, \\
-    University of Massachusetts Lowell, \\
-    in partial fulfillment of the requirements for the degree of
+    {
+      \printdegree \\
+      \@graddate
+    }
 
-    \UP{\printdegree} \\
-    \@graddate
-
-    \@program
+    \UP{\@program\ Program}
   \end{titlepage}
 }
 
